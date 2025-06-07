@@ -1,0 +1,39 @@
+<template>
+  <section class="bg-white py-16 md:py-20">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-12">
+        Emergency Help
+      </h2>
+
+      <div class="bg-[#344C36] rounded-lg w-[80%] m-auto h-[350px] shadow-xl flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 text-white p-8 md:p-12 text-center md:text-left">
+              <h3 class="text-2xl font-bold mb-4">Butuh Bantuan Cepat?</h3>
+              <p class="text-lg leading-relaxed mb-6">
+                  Kami siap membantu Anda dalam situasi darurat dengan layanan respons cepat 24/7.
+                  Baik itu kebocoran, listrik padam mendadak, atau masalah mendesak lainnya.
+              </p>
+              </div>
+
+          <div class="md:w-1/2 h-full flex justify-center items-center overflow-hidden">
+              <img :src="'/images/emergency.png'" alt="Emergency Sign" class="w-full h-full object-cover rounded-lg">
+          </div>
+      </div>
+      <div class="m-auto mt-3">
+              <div class="flex justify-center"> <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full text-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+              Hubungi Sekarang
+          </button>
+      </div>
+          </div>
+    </div>
+  </section>
+</template>
+
+<script>
+export default {
+  name: 'EmergencyHelp',
+};
+</script>
+
+<style scoped>
+/* ... */
+</style>
