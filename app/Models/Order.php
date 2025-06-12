@@ -22,6 +22,9 @@ class Order extends Model
         'status',
         'total_price',
         'original_tukang_id',
+        'location',
+        'payment_status',
+        'snap_token'
     ];
 
     protected $casts = [
@@ -56,6 +59,11 @@ public function warrantyClaims()
     public function worker(): BelongsTo
     {
         return $this->belongsTo(User::class, 'tukang_id');
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function service(): BelongsTo

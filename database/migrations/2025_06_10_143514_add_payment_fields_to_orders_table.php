@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained();
-            $table->integer('score'); // 1-5
-            $table->text('review')->nullable();
-            $table->timestamps();
-        });
+        Schema::table('orders', function (Blueprint $table) {
+        $table->enum('payment_status', ['unpaid', 'paid', 'failed', 'expired'])->default('unpaid')->after('status');
+        $table->string('snap_token')->nullable()->after('payment_status');
+    });
     }
 
     /**
@@ -25,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_proofs');
+        Schema::table('orders', function (Blueprint $table) {
+            //
+        });
     }
 };

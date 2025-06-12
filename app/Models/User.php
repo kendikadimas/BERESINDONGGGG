@@ -6,33 +6,41 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\FilamentUser; // <-- Tambahkan ini
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+
+// Pastikan Anda juga mengimpor model lain yang direlasikan
 use App\Models\Order;
 use App\Models\Rating;
+use App\Models\Service;
 
-class User extends Authenticatable
+// 1. Pastikan kelas Anda mengimplementasikan FilamentUser
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
-
-    use Notifiable;
+    // 2. Tambahkan semua kolom baru ke dalam $fillable
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role', // Wajib ada untuk menyimpan role
+        'phone',
+        'address',
+        'skill',
+        'avatar_path',            // Wajib ada untuk foto profil tukang
+        'identity_document_path', // Wajib ada untuk KTP tukang
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -49,25 +57,57 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'rating' => 'float',
         ];
     }
 
-    public function ordersAsCustomer() {
+    // --- RELASI-RELASI ---
+
+    public function ordersAsCustomer()
+    {
         return $this->hasMany(Order::class, 'user_id');
     }
 
-    public function ordersAsTukang() {
+    public function ordersAsTukang()
+    {
         return $this->hasMany(Order::class, 'tukang_id');
     }
 
-    public function ratings() {
-        return $this->hasManyThrough(Rating::class, Order::class, 'tukang_id');
+    public function offeredServices()
+    {
+        return $this->belongsToMany(Service::class)
+                        ->withPivot('description', 'price', 'status')
+                        ->withTimestamps();
     }
 
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'tukang_id');
+    }
+
+    // --- LOGIKA FILAMENT ---
+    
     public function canAccessPanel(Panel $panel): bool
     {
-        // Izinkan akses ke panel jika user memiliki role 'admin'
-        return $this->role === 'admin';
+        if ($panel->getId() === 'admin') {
+            return $this->role === 'admin';
+        }
+
+        if ($panel->getId() === 'tukang') {
+            return $this->role === 'tukang';
+        }
+
+        return false;
     }
 
+    public function partnerApplications()
+    {
+        return $this->hasMany(PartnerApplication::class);
+    }
+    
+    // app/Models/User.php
+public function testimonials()
+{
+    return $this->hasMany(Testimonial::class);
+}
 }

@@ -3,7 +3,7 @@
       <h2 class="text-3xl  text-green-800 md:text-4xl font-bold text-center m-12 mt-15">
         Alur Pemesanan
       </h2>
-  <section class="bg-green-800 text-white py-16 md:py-20">
+  <section class="bg-[#344C36] text-white py-16 md:py-20">
     <div class="container mx-auto px-4">
 
         <div class="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 justify-items-center items-start text-center max-w-6xl mx-auto">

@@ -25,7 +25,7 @@ defineProps({
         class="w-full h-auto overflow-hidden rounded-lg"
         :class="{ 'md:order-last': imagePosition === 'right' }"
       >
-        <img :src="imageUrl" alt="Call to action image" class="w-full h-full object-cover">
+        <img :src="imageUrl" alt="Call to action image" class="w-full h-full ">
       </div>
 
       <div class="text-left">

@@ -47,18 +47,18 @@ const misiItems = [
                     description="Daftar untuk mendapatkan customer dan meningkatkan reputasi pekerjaan anda! Daftar gratis sekarang juga!"
                     buttonText="Daftar"
                     buttonRouteName="register"
-                    imageUrl="/images/jadi-mitra.jpg"
+                    imageUrl="/images/herorepair.png"
                     imagePosition="left"
                 />
 
-                <CTABlock 
+                <!-- <CTABlock 
                     title="Beresin Permasalahan Rumah Anda"
                     description="Pesan layanan sekarang agar permasalahan rumah anda beres sekarang juga!"
                     buttonText="Pesan"
                     buttonRouteName="home"
                     imageUrl="/images/pesan-layanan.jpg"
                     imagePosition="right"
-                />
+                /> -->
 
             </div>
         </div>

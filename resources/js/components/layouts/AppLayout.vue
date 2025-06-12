@@ -1,58 +1,104 @@
-<script>
-// 1. Semua import harus berada di bagian paling atas file
-import { Link } from '@inertiajs/vue3';
-// Jika Anda ingin menggunakan FontAwesome, impor di sini juga
-// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+<script setup>
+import { computed, watch } from 'vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
 
-export default {
-  name: 'AppLayout',
-  // 2. Daftarkan komponen agar bisa dipakai di template
-  components: {
-    Link,
-    // FontAwesomeIcon,
+// Mengambil data user yang sedang login dari props global Inertia
+const user = computed(() => usePage().props.auth.user);
+
+// "Listener" ini akan mengawasi snap_token dari Midtrans
+watch(
+  () => usePage().props.flash,
+  (flash) => {
+    // TES 1: Cek apakah watcher ini berjalan
+    console.log("--- Watcher di AppLayout Berjalan ---");
+    console.log("Data flash yang diterima:", flash);
+
+    if (flash && flash.snap_token) {
+      // TES 2: Cek apakah snap_token terdeteksi
+      console.log("✅ SNAP TOKEN DITEMUKAN:", flash.snap_token);
+
+      // TES 3: Cek apakah library Midtrans (snap) sudah siap
+      if (window.snap) {
+        console.log("✅ window.snap SIAP. Memanggil popup...");
+        window.snap.pay(flash.snap_token, {
+          onSuccess: (result) => {
+            alert("Pembayaran Berhasil!");
+            router.visit(route('profile'));
+          },
+          // ... callback lainnya
+        });
+      } else {
+        console.error("❌ ERROR: window.snap tidak ditemukan. Periksa script Midtrans di app.blade.php.");
+      }
+    } else {
+      console.log("ℹ️ Tidak ada snap_token di dalam flash message kali ini.");
+    }
   },
+  { deep: true }
+);
+
+// Fungsi logout
+const handleLogout = () => {
+    router.post(route('logout'));
 };
 </script>
 
 <template>
   <div class="flex flex-col min-h-screen font-sans">
-    <header class="bg-[#344C36] shadow-md py-4">
-      <div class="container mx-auto px-4 flex items-center justify-between">
-        <div class="flex items-center">
-            <Link :href="route('home')">
-                <div class="flex items-center">
-                    <div class="text-xl font-bold text-white">BERESIN</div>
-                    <span class="text-xl font-bold text-[#F9AD19]">DONG</span>
-                </div>
-            </Link>
+    <header class="bg-[#344C36] shadow-md py-4 sticky top-0 z-50">
+      <div class="container mx-auto px-6 flex items-center justify-between">
+        
+        <div class="flex-shrink-0">
+          <Link :href="route('home')">
+            <div class="flex items-center">
+              <div class="text-2xl font-bold text-white">BERESIN</div>
+              <span class="text-2xl font-bold text-[#F9AD19]">DONG</span>
+            </div>
+          </Link>
         </div>
-        <nav class="hidden md:block">
-          <ul class="flex space-x-6">
-            <li><a href="#" class="text-white hover:text-green-800 transition-colors duration-300">Repairing</a></li>
-            <li><a href="#" class="text-white hover:text-green-800 transition-colors duration-300">Cleaning</a></li>
-            <li><a href="#" class="text-white hover:text-green-800 transition-colors duration-300">Jadi Mitra</a></li>
-            <li><a href="#" class="text-white hover:text-green-800 transition-colors duration-300">About Us</a></li>
+
+        <nav class="hidden md:flex flex-grow justify-center">
+          <ul class="flex items-center space-x-8 text-base">
+            <li><Link :href="route('repairing')" class="text-white hover:text-yellow-400 transition-colors">Repairing</Link></li>
+            <li><Link :href="route('cleaning')" class="text-white hover:text-yellow-400 transition-colors">Cleaning</Link></li>
+            <li><Link :href="route('partner.apply')" class="text-white hover:text-yellow-400 transition-colors">Jadi Mitra</Link></li>
+            <li><Link :href="route('about')" class="text-white hover:text-yellow-400 transition-colors">About Us</Link></li>
           </ul>
         </nav>
+        
+        <div class="hidden md:flex w-64 flex-shrink-0 items-center justify-end">
+          
+          <div v-if="user" class="flex items-center space-x-4">
+            <span class="text-white text-sm font-medium truncate">Halo, {{ user.name }}</span>
+            <Link :href="route('profile')">
+               <img 
+                  :src="user.avatar_path ? user.avatar_path : '/images/default-avatar.png'" 
+                  alt="Avatar" 
+                  class="w-11 h-11 rounded-full object-cover border-2 border-yellow-500"
+               >
+            </Link>
+            </div>
 
-        <div class="flex items-center space-x-4">
-          <Link :href="route('login')">
-            <button class="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-semibold py-2 px-4 rounded-full text-sm shadow-md transition-all duration-300">
-              Login
-            </button>
-          </Link>
-          <Link :href="route('register')">
-            <button class="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-semibold py-2 px-4 rounded-full text-sm shadow-md transition-all duration-300">
-              Register
-            </button>
-          </Link>
+          <div v-else class="flex items-center space-x-4">
+            <Link :href="route('login')">
+              <button class="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-semibold py-2 px-6 rounded-full text-sm shadow-md transition-all">
+                Login
+              </button>
+            </Link>
+            <Link :href="route('register')">
+              <button class="bg-transparent border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-green-900 font-semibold py-2 px-6 rounded-full text-sm transition-all">
+                Register
+              </button>
+            </Link>
+          </div>
         </div>
 
-        <button class="md:hidden text-gray-600 focus:outline-none">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path>
-          </svg>
-        </button>
+        <div class="md:hidden">
+          <button class="text-white focus:outline-none">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+        </div>
+
       </div>
     </header>
 
@@ -60,7 +106,7 @@ export default {
       <slot></slot>
     </main>
 
-   <footer class="bg-[#344C36] text-white py-8">
+    <footer class="bg-[#344C36] text-white py-8">
       <div class="container mx-auto px-4">
       <hr class="border-white my-6">
       <div class="flex justify-between items-start my-10 ml-15">
@@ -136,7 +182,3 @@ export default {
     </footer>
   </div>
 </template>
-
-<style scoped>
-/* Anda bisa menambahkan gaya kustom jika diperlukan, tapi Tailwind seharusnya cukup */
-</style>

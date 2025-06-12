@@ -1,24 +1,35 @@
 <template>
-  <section class="bg-[#344C36] text-white py-16 md:py-20 mb-60">
-    <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center md:justify-around space-y-8 md:space-y-0">
-      <div class="flex-shrink-0">
-        <img :src="'/images/1-year-warranty.png'" alt="1 Year Warranty Badge" class="h-32 w-32 md:h-40 md:w-40 object-contain mx-auto">
-      </div>
-      <div class="text-center md:text-left max-w-lg">
-        <h3 class="text-3xl font-bold mb-4">{{ title }}</h3>
-        <p class="text-lg leading-relaxed mb-6">
-          {{ description }}
-        </p>
-        <button v-if="buttonText" class="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-3 px-8 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-300">
-          {{ buttonText }}
-        </button>
-      </div>
+  <section class="bg-[#344C36] text-white p-4 py-16 md:py-20 relative overflow-hidden mb-36">
+    
+    <div class="absolute mt-6 top-1/2 -translate-y-1/2 w-2/5 md:w-1/3 lg:w-1/4 opacity-10 md:opacity-100 transform translate-x-1/4 md:translate-x-1/3">
+       <img
+           :src="warrantyBadgeImage"
+           alt="1 Year Warranty Badge"
+           class="w-full h-auto"
+       >
+   </div>
+
+    <div class="container mx-auto px-4 flex items-center relative z-10">
+        <div class="w-0 md:w-1/3 lg:w-2/5"></div>
+
+        <div class="w-2/3 md:w-2/3 lg:w-3/5 text-center md:text-left">
+            <h3 class="text-3xl lg:text-4xl font-bold mb-4">{{ title }}</h3>
+            <p class="text-lg leading-relaxed mb-6 opacity-90">
+                {{ description }}
+            </p>
+            <!-- <Link v-if="buttonText" :href="route('warranty.claim.create')">
+              <button class="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-3 px-8 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-300">
+                  {{ buttonText }}
+              </button>
+            </Link> -->
+        </div>
     </div>
   </section>
 </template>
 
 <script setup>
 import { defineProps } from 'vue';
+import { Link } from '@inertiajs/vue3'; // Impor Link untuk tombol
 
 const props = defineProps({
   title: {
@@ -31,15 +42,11 @@ const props = defineProps({
   },
   warrantyBadgeImage: {
     type: String,
-    default: '/images/1-year-warranty.png',
+    default: '/images/warranty.png', // Pastikan gambar ini ada di public/images
   },
   buttonText: {
     type: String,
-    default: 'Klaim',
+    default: 'Klaim Garansi',
   },
 });
 </script>
-
-<style scoped>
-/* ... */
-</style>    

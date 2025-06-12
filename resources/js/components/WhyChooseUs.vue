@@ -7,9 +7,9 @@
 
       <carousel :items-to-show="1" :wrap-around="true">
         <slide v-for="slide in slides" :key="slide.id">
-          <div class="bg-[#344C36] w-[80%] h-[90%] rounded-lg shadow-xl px-24 md:p-12 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12">
+          <div class="bg-[#344C36] w-[60%] h-[80%] rounded-lg shadow-xl px-24 md:p-12 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12">
             <div class="w-1/3 md:w-1/2  text-center md:text-left">
-              <p class="text-white text-lg md:text-xl leading-relaxed mb-6">
+              <p class="text-white text-lg md:text-s leading-relaxed mb-6">
                 {{ slide.description }}
               </p>
               <ul class="text-white space-y-3 text-base">
@@ -70,16 +70,6 @@ export default {
             'Dukungan Pelanggan: Siap membantu 24/7.',
             'Layanan Kustom: Sesuaikan paket kebersihan Anda.',
             'Pembayaran Aman: Berbagai opsi pembayaran tersedia.',
-          ],
-          image: '/images/trusted.png', // Ganti dengan gambar lain yang relevan
-          alt: 'Cleaning service illustration',
-        },
-        {
-          id: 3,
-          description: 'Pekerja kami berkomitmen untuk memberikan pelayanan terbaik dan termudah untuk kebutuhan rumah Anda.',
-          features: [
-            'Pekerja handal terkualifikasi',
-            'Bekerja dengan penuh professinalitas',
           ],
           image: '/images/trusted.png', // Ganti dengan gambar lain yang relevan
           alt: 'Cleaning service illustration',

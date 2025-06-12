@@ -1,8 +1,8 @@
 <template>
-  <section class="bg-gray-100 py-16 md:py-20">
+  <section class="bg-gray-100 py-16 md:py-20" id="services">
     <div class="container mx-auto px-4">
         <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-12">
-            Layanan <span class="text-yellow-500">Kami</span>
+            Layanan Kami
         </h2>
 
         <div class="max-w-6xl mx-auto"> 
@@ -14,7 +14,7 @@
                         <p class="text-gray-700 text-base mb-4">
                             Pembersihan menyeluruh untuk rumah, kantor, atau properti komersial Anda.
                         </p>
-                        <a href="#" class="inline-block text-yellow-600 hover:text-yellow-700 font-semibold transition-colors duration-300">
+                        <a href="/cleaning" class="inline-block text-yellow-600 hover:text-yellow-700 font-semibold transition-colors duration-300">
                             Lihat Detail &rarr;
                         </a>
                     </div>
@@ -27,7 +27,7 @@
                         <p class="text-gray-700 text-base mb-4">
                             Perbaikan berbagai kerusakan rumah tangga oleh tenaga ahli.
                         </p>
-                        <a href="#" class="inline-block text-yellow-600 hover:text-yellow-700 font-semibold transition-colors duration-300">
+                        <a href="/repairing" class="inline-block text-yellow-600 hover:text-yellow-700 font-semibold transition-colors duration-300">
                             Lihat Detail &rarr;
                         </a>
                     </div>

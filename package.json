@@ -43,6 +43,7 @@
         "vite": "^6.2.0",
         "vue": "^3.5.13",
         "vue3-carousel": "^0.15.1",
+        "vue3-carousel-nuxt": "^1.1.6",
         "ziggy-js": "^2.5.3"
     },
     "optionalDependencies": {

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,109 +10,102 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Columns\BadgeColumn; // Gunakan BadgeColumn untuk role
-use Filament\Tables\Actions\Action; // Untuk aksi kustom
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter; // Untuk filter
-use App\Filament\Resources\UserResource\Widgets\UserStatsWidget; // Impor widget
-
+use Illuminate\Support\Facades\Hash;
+use Filament\Notifications\Notification;
+use Filament\Infolists; // <-- Impor Infolists
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = 'Manajemen';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\TextInput::make('name')->required(),
+                Forms\Components\TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
+                Forms\Components\Select::make('role')
+                    ->options([
+                        'admin' => 'Admin',
+                        'customer' => 'Customer',
+                        'tukang' => 'Tukang',
+                    ])
+                    ->required()->native(false),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('role')
-                    ->required(),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255)
-                    ->default(null),
-                Forms\Components\Textarea::make('address')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('skill')
-                    ->maxLength(255)
-                    ->default(null),
-                Forms\Components\TextInput::make('rating')
-                    ->required()
-                    ->numeric()
-                    ->default(0.0),
+                    ->required(fn (string $context): bool => $context === 'create')
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
+                // ... tambahkan field lain jika perlu diedit admin
             ]);
     }
 
     public static function table(Table $table): Table
-{
-    return $table
-        ->columns([
-            TextColumn::make('id')->sortable(),
-            TextColumn::make('name')->label('Username')->searchable(),
-            TextColumn::make('email')->searchable(),
-            // Gunakan BadgeColumn agar 'role' terlihat lebih bagus
-            BadgeColumn::make('role')
-                ->colors([
+    {
+        return $table
+            ->tabs([
+                'all' => Tables\Tabs\Tab::make('Semua User'),
+                'pending_partners' => Tables\Tabs\Tab::make('Ajuan Mitra Pending')
+                    ->badge(User::whereHas('partnerApplications', fn ($query) => $query->where('status', 'pending'))->count())
+                    ->modifyQueryUsing(function (Builder $query) {
+                        $query->whereHas('partnerApplications', function (Builder $q) {
+                            $q->where('status', 'pending');
+                        });
+                    }),
+            ])
+            ->columns([
+                Tables\Columns\ImageColumn::make('avatar_path')->label('Foto')->disk('public')->circular(),
+                Tables\Columns\TextColumn::make('name')->label('Username')->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\BadgeColumn::make('role')->colors([
                     'primary' => 'customer',
                     'success' => 'tukang',
                     'danger' => 'admin',
-                ])
-                ->searchable(),
-            TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-            TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-        ])
-        ->filters([
-            // Tambahkan filter berdasarkan role
-            SelectFilter::make('role')
-                ->options([
-                    'admin' => 'Admin',
-                    'customer' => 'Customer',
-                    'tukang' => 'Tukang',
-                ])
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make()->icon('heroicon-o-pencil-square')->iconButton(),
-            // Aksi kustom untuk verifikasi
-            Action::make('verify')
-                ->label('Verifikasi')
-                ->icon('heroicon-o-check-circle')
-                ->color('success')
-                ->iconButton()
-                ->action(function (User $record) {
-                    $record->email_verified_at = now();
-                    $record->save();
-                })
-                // Hanya tampilkan tombol ini jika user belum diverifikasi
-                ->visible(fn (User $record): bool => !$record->hasVerifiedEmail()), 
-            Tables\Actions\DeleteAction::make()->icon('heroicon-o-trash')->iconButton(),
-        ])
-        ->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-        ]);
-}
+                ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+                // Aksi untuk me-review ajuan
+                Tables\Actions\Action::make('review_application')
+                    ->label('Review Ajuan')
+                    ->icon('heroicon-o-document-magnifying-glass')
+                    ->color('info')
+                    ->visible(fn (User $record): bool => $record->partnerApplications()->where('status', 'pending')->exists())
+                    ->modalSubmitActionLabel('Setujui')
+                    ->infolist([
+                        // Ambil data dari relasi 'partnerApplications'
+                        Infolists\Components\ImageEntry::make('partnerApplications.profile_photo_path')
+                            ->label('Foto Profil Diajukan')->disk('public'),
+                        Infolists\Components\ImageEntry::make('partnerApplications.identity_document_path')
+                            ->label('Dokumen Identitas (KTP)')->disk('public'),
+                    ])
+                    ->action(function (User $record) {
+                        $application = $record->partnerApplications()->where('status', 'pending')->first();
+                        if ($application) {
+                            $record->update(['role' => 'tukang']);
+                            $application->update(['status' => 'approved']);
+                            Notification::make()->title('Mitra berhasil disetujui!')->success()->send();
+                        }
+                    })
+                    ->extraModalActions([
+                        Tables\Actions\Action::make('reject')
+                            ->label('Tolak')
+                            ->color('danger')
+                            ->requiresConfirmation()
+                            ->action(function (User $record) {
+                                $application = $record->partnerApplications()->where('status', 'pending')->first();
+                                if ($application) {
+                                    $application->update(['status' => 'rejected']);
+                                    Notification::make()->title('Pengajuan berhasil ditolak.')->warning()->send();
+                                }
+                            })
+                            ->cancel(),
+                    ]),
+            ]);
     }
 
     public static function getPages(): array
@@ -123,5 +115,5 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
-    }
+    }    
 }

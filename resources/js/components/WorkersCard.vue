@@ -1,6 +1,4 @@
 <script setup>
-// Kita mendefinisikan semua data yang bisa berubah sebagai 'props'.
-// Ini membuat komponen kita dinamis dan bisa digunakan di mana saja.
 defineProps({
   name: {
     type: String,
@@ -11,8 +9,8 @@ defineProps({
     required: true,
   },
   imageUrl: {
-    type: String,
-    required: true,
+    type: [String, null],
+    required: false,
   },
   rating: {
     type: Number,
@@ -26,8 +24,9 @@ defineProps({
     
     <div 
       class="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
-      :style="{ backgroundImage: `url(${imageUrl})` }"
-    ></div>
+      :style="{ backgroundImage: `url(${imageUrl || '/images/default-avatar.png'})` }" 
+    >
+      </div>
 
     <div class="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-black/50 px-3 py-1 text-white backdrop-blur-sm">
       <span class="font-bold">{{ rating }}</span>
