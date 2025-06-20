@@ -72,7 +72,7 @@ const handleLogout = () => {
             <span class="text-white text-sm font-medium truncate">Halo, {{ user.name }}</span>
             <Link :href="route('profile')">
                <img 
-                  :src="user.avatar_path ? user.avatar_path : '/images/default-avatar.png'" 
+                  :src="user.avatar_path ? user.avatar_path : '/images/default.jpg'" 
                   alt="Avatar" 
                   class="w-11 h-11 rounded-full object-cover border-2 border-yellow-500"
                >

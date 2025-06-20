@@ -35,20 +35,26 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
-    public function share(Request $request): array
+        public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            // BAGIAN PENTING ADA DI SINI
+            // Data autentikasi yang sudah ada
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
-                    // Anda juga bisa menambahkan path avatar di sini
                     'avatar_path' => $request->user()->avatar_path,
                 ] : null,
-                ],
+            ],
+
+            // TAMBAHKAN BLOK INI UNTUK MENGAMBIL FLASH MESSAGE
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+                'snap_token' => fn () => $request->session()->get('snap_token'),
+            ],
         ]);
     }
-}
+    }

@@ -12,23 +12,20 @@ class ProfileController extends Controller
     /**
      * Menampilkan halaman profil user beserta riwayat pesanannya.
      */
-    public function show(Request $request): InertiaResponse
+    public function show(Request $request)
     {
-        // 1. Ambil data user yang sedang login
         $user = Auth::user();
 
-        // 2. Ambil riwayat pesanan (sebagai customer) milik user tersebut
-        // Gunakan .with() untuk eager loading agar query efisien
+        // Modifikasi query untuk memuat relasi 'rating'
         $orders = $user->ordersAsCustomer()
             ->with([
-                'worker:id,name', // Ambil hanya id dan nama dari relasi worker
-                'service:id,name,service_category_id', // Ambil data dari relasi service
-                'service.category:id,name' // Ambil data dari relasi category di dalam service
+                'worker:id,name',
+                'service.category:id,name',
+                'rating', // <-- TAMBAHKAN INI
             ])
-            ->latest() // Urutkan dari yang terbaru
+            ->latest()
             ->get();
 
-        // 3. Render komponen Vue dan kirim data sebagai props
         return Inertia::render('ProfilePage', [
             'user' => $user,
             'orders' => $orders,

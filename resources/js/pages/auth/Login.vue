@@ -68,7 +68,7 @@ const submit = () => {
                             <div>
                                 <div class="flex items-center justify-between mb-1">
                                     <Label for="password" class="text-sm font-medium text-gray-700">Password</Label>
-                                    <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm">
+                                    <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm text-gray-700">
                                         Lupa password?
                                     </TextLink>
                                 </div>
@@ -105,7 +105,7 @@ const submit = () => {
 
                         <div class="text-center text-sm text-gray-600">
                             Belum punya akun?
-                            <TextLink :href="route('register')">Daftar sekarang</TextLink>
+                            <TextLink :href="route('register')" class="text-gray-700">Daftar sekarang</TextLink>
                         </div>
                     </form>
                 </div>

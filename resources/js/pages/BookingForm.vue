@@ -90,7 +90,7 @@ const submit = () => {
                     </div>
                      <div>
                         <label for="location" class="text-sm font-medium text-gray-700">Isi alamat lengkap Anda</label>
-                        <input v-model="form.location" id="location" type="text" placeholder="Contoh: Jl. Merdeka No. 12..." required class="mt-1 w-full bg-gray-100 border-2 rounded-lg p-4 ...">
+                        <input v-model="form.location" id="location" type="text" placeholder="Contoh: Jl. Merdeka No. 12..." required class="mt-1 w-full bg-gray-100 border-2 rounded-lg p-4 text-gray-700">
                          <p v-if="form.errors.location" class="text-sm text-red-600 mt-1">{{ form.errors.location }}</p>
                     </div>
                     

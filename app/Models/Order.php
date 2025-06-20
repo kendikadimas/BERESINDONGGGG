@@ -51,7 +51,7 @@ public function warrantyClaims()
     }
 
     // Relasi ke Rating
-    public function rating(): HasOne
+    public function rating()
     {
         return $this->hasOne(Rating::class);
     }

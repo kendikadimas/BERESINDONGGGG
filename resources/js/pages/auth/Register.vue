@@ -113,7 +113,7 @@ const submit = () => {
 
                         <div class="text-center text-sm text-gray-600">
                             Sudah punya akun?
-                            <TextLink :href="route('login')">Login di sini</TextLink>
+                            <TextLink :href="route('login')" class="text-gray-700">Login di sini</TextLink>
                         </div>
                     </form>
                 </div>

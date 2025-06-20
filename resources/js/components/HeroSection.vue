@@ -11,9 +11,9 @@
         <a href="/repairing" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 animate__animated animate__zoomIn animate__delay-1s"  >
           Pesan Sekarang
         </a>
-        <a href="/about" class="ml-5 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 animate__animated animate__zoomIn animate__delay-1s"  >
+        <!-- <a href="/about" class="bg-transparent border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-green-900 font-semibold py-2 px-6 rounded-full text-sm transition-all"  >
           About
-        </a>
+        </a> -->
       </div>
       <div class="md:w-1/2 flex justify-center md:justify-end animate__animated animate__fadeInRight animate__delay-0.8s">
         <img :src="'/images/hero1.png'" alt="Pekerja Beresindong Ilustrasi" class="w-3/4 h-auto object-contain">

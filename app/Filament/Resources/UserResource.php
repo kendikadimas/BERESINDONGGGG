@@ -6,52 +6,61 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
-use Filament\Notifications\Notification;
-use Filament\Infolists; // <-- Impor Infolists
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?int $navigationSort = 1;
-    protected static ?string $navigationGroup = 'Manajemen';
+    protected static ?string $navigationGroup = 'Manajemen User';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->required(),
-                Forms\Components\TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
+                Forms\Components\TextInput::make('name')->required()->maxLength(255),
+                Forms\Components\TextInput::make('email')->email()->required()->unique(ignoreRecord: true)->maxLength(255),
                 Forms\Components\Select::make('role')
                     ->options([
                         'admin' => 'Admin',
                         'customer' => 'Customer',
                         'tukang' => 'Tukang',
                     ])
-                    ->required()->native(false),
+                    ->required()->native(false)->live(),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required(fn (string $context): bool => $context === 'create')
                     ->dehydrated(fn ($state) => filled($state))
                     ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
-                // ... tambahkan field lain jika perlu diedit admin
+                
+                Forms\Components\Section::make('Informasi Tukang')
+                    ->collapsible()
+                    ->visible(fn (Forms\Get $get): bool => $get('role') === 'tukang')
+                    ->schema([
+                        Forms\Components\FileUpload::make('avatar_path')->label('Foto Profil')->image()->disk('public')->directory('avatars'),
+                        Forms\Components\FileUpload::make('identity_document_path')->label('Dokumen Identitas')->disk('public')->directory('identity-documents'),
+                        Forms\Components\TextInput::make('phone')->tel(),
+                        Forms\Components\Textarea::make('address')->columnSpanFull(),
+                        Forms\Components\TextInput::make('skill'),
+                    ]),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->tabs([
-                'all' => Tables\Tabs\Tab::make('Semua User'),
-                'pending_partners' => Tables\Tabs\Tab::make('Ajuan Mitra Pending')
-                    ->badge(User::whereHas('partnerApplications', fn ($query) => $query->where('status', 'pending'))->count())
-                    ->modifyQueryUsing(function (Builder $query) {
-                        $query->whereHas('partnerApplications', function (Builder $q) {
+            // HAPUS ->tabs([...]) DAN GANTI DENGAN ->filters([...])
+            ->filters([
+                Tables\Filters\Filter::make('pending_partners')
+                    ->label('Ajuan Mitra Pending')
+                    ->query(function (Builder $query): Builder {
+                        return $query->whereHas('partnerApplications', function (Builder $q) {
                             $q->where('status', 'pending');
                         });
                     }),
@@ -68,8 +77,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-
-                // Aksi untuk me-review ajuan
+                
                 Tables\Actions\Action::make('review_application')
                     ->label('Review Ajuan')
                     ->icon('heroicon-o-document-magnifying-glass')
@@ -77,16 +85,16 @@ class UserResource extends Resource
                     ->visible(fn (User $record): bool => $record->partnerApplications()->where('status', 'pending')->exists())
                     ->modalSubmitActionLabel('Setujui')
                     ->infolist([
-                        // Ambil data dari relasi 'partnerApplications'
-                        Infolists\Components\ImageEntry::make('partnerApplications.profile_photo_path')
-                            ->label('Foto Profil Diajukan')->disk('public'),
-                        Infolists\Components\ImageEntry::make('partnerApplications.identity_document_path')
-                            ->label('Dokumen Identitas (KTP)')->disk('public'),
+                        Infolists\Components\ImageEntry::make('partnerApplications.profile_photo_path')->label('Foto Profil Diajukan')->disk('public'),
+                        Infolists\Components\ImageEntry::make('partnerApplications.identity_document_path')->label('Dokumen Identitas (KTP)')->disk('public'),
                     ])
                     ->action(function (User $record) {
                         $application = $record->partnerApplications()->where('status', 'pending')->first();
                         if ($application) {
-                            $record->update(['role' => 'tukang']);
+                            $record->update([
+                                'role' => 'tukang',
+                                'avatar_path' => $application->profile_photo_path
+                            ]);
                             $application->update(['status' => 'approved']);
                             Notification::make()->title('Mitra berhasil disetujui!')->success()->send();
                         }
@@ -103,11 +111,10 @@ class UserResource extends Resource
                                     Notification::make()->title('Pengajuan berhasil ditolak.')->warning()->send();
                                 }
                             })
-                            ->cancel(),
                     ]),
             ]);
     }
-
+    
     public static function getPages(): array
     {
         return [

@@ -11,6 +11,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PartnerApplicationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\WarrantyClaimController; // Asumsi Anda punya controller ini
 
@@ -35,6 +36,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking/{service}/{tukang}', [BookingController::class, 'create'])->name('booking.create');
     Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
     Route::post('/checkout/{order}', [PaymentController::class, 'createTransaction'])->name('checkout.create');
+        Route::post('/ratings/{order}', [RatingController::class, 'store'])->name('ratings.store');
+
 });
 // Rute ini tidak perlu auth karena link bisa dibuka oleh siapa saja untuk bayar
 Route::get('/checkout-page/{order}', [PaymentController::class, 'showCheckoutPage'])->name('checkout.show');
